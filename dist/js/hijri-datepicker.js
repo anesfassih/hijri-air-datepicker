@@ -1,6 +1,6 @@
 ;(function (window, $, undefined) { ;(function () {
     var VERSION = '2.2.3',
-        pluginName = 'datepicker',
+        pluginName = 'h_datepicker',
         autoInitSelector = '.datepicker-here',
         $body, $datepickersContainer,
         containerBuilt = false,
@@ -13,8 +13,8 @@
         defaults = {
             classes: '',
             inline: false,
-            language: 'ru',
-            startDate: new Date(),
+            language: 'en',
+            startDate: moment(),
             firstDay: '',
             weekends: [6, 0],
             dateFormat: '',
@@ -37,8 +37,8 @@
             selectOtherYears: true,
             moveToOtherYearsOnSelect: true,
 
-            minDate: '',
-            maxDate: '',
+            minDate: moment(-1035158400000),
+            maxDate: moment(3373570800000),
             disableNavWhenOutOfRange: true,
 
             multipleDates: false, // Boolean or Number
@@ -101,7 +101,7 @@
             'altDown': [18, 40],
             'ctrlShiftUp': [16, 17, 38]
         },
-        datepicker;
+        h_datepicker;
 
     var Datepicker  = function (el, options) {
         this.el = el;
@@ -114,7 +114,7 @@
         }
 
         if (!this.opts.startDate) {
-            this.opts.startDate = new Date();
+            this.opts.startDate = moment();
         }
 
         if (this.el.nodeName == 'INPUT') {
@@ -142,9 +142,9 @@
         this.init()
     };
 
-    datepicker = Datepicker;
+    h_datepicker = Datepicker;
 
-    datepicker.prototype = {
+    h_datepicker.prototype = {
         VERSION: VERSION,
         viewIndexes: ['days', 'months', 'years'],
 
@@ -174,7 +174,7 @@
             }
 
             if (this.opts.timepicker) {
-                this.timepicker = new $.fn.datepicker.Timepicker(this, this.opts);
+                this.timepicker = new $.fn.h_datepicker.Timepicker(this, this.opts);
                 this._bindTimepickerEvents();
             }
 
@@ -182,9 +182,9 @@
                 this.$datepicker.addClass('-only-timepicker-');
             }
 
-            this.views[this.currentView] = new $.fn.datepicker.Body(this, this.currentView, this.opts);
+            this.views[this.currentView] = new $.fn.h_datepicker.Body(this, this.currentView, this.opts);
             this.views[this.currentView].show();
-            this.nav = new $.fn.datepicker.Navigation(this, this.opts);
+            this.nav = new $.fn.h_datepicker.Navigation(this, this.opts);
             this.view = this.currentView;
 
             this.$el.on('clickCell.adp', this._onClickCell.bind(this));
@@ -195,8 +195,8 @@
         },
 
         _createShortCuts: function () {
-            this.minDate = this.opts.minDate ? this.opts.minDate : new Date(-8639999913600000);
-            this.maxDate = this.opts.maxDate ? this.opts.maxDate : new Date(8639999913600000);
+            this.minDate = this.opts.minDate ? this.opts.minDate : moment(-1035158400000);
+            this.maxDate = this.opts.maxDate ? this.opts.maxDate : moment(3373570800000);
         },
 
         _bindEvents : function () {
@@ -224,15 +224,15 @@
 
         _defineLocale: function (lang) {
             if (typeof lang == 'string') {
-                this.loc = $.fn.datepicker.language[lang];
+                this.loc = $.fn.h_datepicker.language[lang];
                 if (!this.loc) {
-                    console.warn('Can\'t find language "' + lang + '" in Datepicker.language, will use "ru" instead');
-                    this.loc = $.extend(true, {}, $.fn.datepicker.language.ru)
+                    console.warn('Can\'t find language "' + lang + '" in Datepicker.language, will use "en" instead');
+                    this.loc = $.extend(true, {}, $.fn.h_datepicker.language.en)
                 }
 
-                this.loc = $.extend(true, {}, $.fn.datepicker.language.ru, $.fn.datepicker.language[lang])
+                this.loc = $.extend(true, {}, $.fn.h_datepicker.language.en, $.fn.h_datepicker.language[lang])
             } else {
-                this.loc = $.extend(true, {}, $.fn.datepicker.language.ru, lang)
+                this.loc = $.extend(true, {}, $.fn.h_datepicker.language.en, lang)
             }
 
             if (this.opts.dateFormat) {
@@ -297,17 +297,17 @@
             }
 
             var selectedDates = this.selectedDates,
-                parsedSelected = datepicker.getParsedDate(selectedDates[0]),
+                parsedSelected = h_datepicker.getParsedDate(selectedDates[0]),
                 formattedDates,
                 _this = this,
-                dates = new Date(
+                dates = moment(new Date(
                     parsedSelected.year,
                     parsedSelected.month,
                     parsedSelected.date,
                     parsedSelected.hours,
                     parsedSelected.minutes,
                     parsedSelected.seconds
-                );
+                ));
 
                 formattedDates = selectedDates.map(function (date) {
                     return _this.formatDate(_this.loc.dateFormat, date)
@@ -316,15 +316,15 @@
             // Create new dates array, to separate it from original selectedDates
             if (this.opts.multipleDates || this.opts.range) {
                 dates = selectedDates.map(function(date) {
-                    var parsedDate = datepicker.getParsedDate(date);
-                    return new Date(
+                    var parsedDate = h_datepicker.getParsedDate(date);
+                    return moment(new Date(
                         parsedDate.year,
                         parsedDate.month,
                         parsedDate.date,
                         parsedDate.hours,
                         parsedDate.minutes,
                         parsedDate.seconds
-                    );
+                    ));
                 })
             }
             this._prevOnSelectValue = formattedDates;
@@ -336,15 +336,15 @@
                 o = this.opts;
             switch (this.view) {
                 case 'days':
-                    this.date = new Date(d.year, d.month + 1, 1);
-                    if (o.onChangeMonth) o.onChangeMonth(this.parsedDate.month, this.parsedDate.year);
+                    this.date = moment().startOf('day').iYear(d.h_year).iMonth(d.h_month + 1).iDate(1);
+                    if (o.onChangeMonth) o.onChangeMonth(this.parsedDate.h_month, this.parsedDate.h_year);
                     break;
                 case 'months':
-                    this.date = new Date(d.year + 1, d.month, 1);
-                    if (o.onChangeYear) o.onChangeYear(this.parsedDate.year);
+                    this.date = moment().startOf('iMonth').iYear(d.h_year + 1).iMonth(d.h_month);
+                    if (o.onChangeYear) o.onChangeYear(this.parsedDate.h_year);
                     break;
                 case 'years':
-                    this.date = new Date(d.year + 10, 0, 1);
+                    this.date = moment().startOf('iYear').iYear(d.h_year + 10);
                     if (o.onChangeDecade) o.onChangeDecade(this.curDecade);
                     break;
             }
@@ -355,15 +355,15 @@
                 o = this.opts;
             switch (this.view) {
                 case 'days':
-                    this.date = new Date(d.year, d.month - 1, 1);
-                    if (o.onChangeMonth) o.onChangeMonth(this.parsedDate.month, this.parsedDate.year);
+                    this.date = moment().startOf('day').iYear(d.h_year).iMonth(d.h_month - 1).iDate(1);
+                    if (o.onChangeMonth) o.onChangeMonth(this.parsedDate.h_month, this.parsedDate.h_year);
                     break;
                 case 'months':
-                    this.date = new Date(d.year - 1, d.month, 1);
-                    if (o.onChangeYear) o.onChangeYear(this.parsedDate.year);
+                    this.date = moment().startOf('iMonth').iYear(d.h_year - 1).iMonth(d.h_month);
+                    if (o.onChangeYear) o.onChangeYear(this.parsedDate.h_year);
                     break;
                 case 'years':
-                    this.date = new Date(d.year - 10, 0, 1);
+                    this.date = moment().startOf('iYear').iYear(d.h_year - 10);
                     if (o.onChangeDecade) o.onChangeDecade(this.curDecade);
                     break;
             }
@@ -374,9 +374,9 @@
             var result = string,
                 boundary = this._getWordBoundaryRegExp,
                 locale = this.loc,
-                leadingZero = datepicker.getLeadingZeroNum,
-                decade = datepicker.getDecade(date),
-                d = datepicker.getParsedDate(date),
+                leadingZero = h_datepicker.getLeadingZeroNum,
+                decade = h_datepicker.getDecade(date),
+                d = h_datepicker.getParsedDate(date),
                 fullHours = d.fullHours,
                 hours = d.hours,
                 ampm = string.match(boundary('aa')) || string.match(boundary('AA')),
@@ -399,21 +399,21 @@
                 case /AA/.test(result):
                     result = replacer(result, boundary('AA'), dayPeriod.toUpperCase());
                 case /dd/.test(result):
-                    result = replacer(result, boundary('dd'), d.fullDate);
+                    result = replacer(result, boundary('dd'), d.h_fullDate);
                 case /d/.test(result):
-                    result = replacer(result, boundary('d'), d.date);
+                    result = replacer(result, boundary('d'), d.h_date);
                 case /DD/.test(result):
-                    result = replacer(result, boundary('DD'), locale.days[d.day]);
+                    result = replacer(result, boundary('DD'), locale.days[d.h_day]);
                 case /D/.test(result):
-                    result = replacer(result, boundary('D'), locale.daysShort[d.day]);
+                    result = replacer(result, boundary('D'), locale.daysShort[d.h_day]);
                 case /mm/.test(result):
-                    result = replacer(result, boundary('mm'), d.fullMonth);
+                    result = replacer(result, boundary('mm'), d.h_fullMonth);
                 case /m/.test(result):
-                    result = replacer(result, boundary('m'), d.month + 1);
+                    result = replacer(result, boundary('m'), d.h_month + 1);
                 case /MM/.test(result):
-                    result = replacer(result, boundary('MM'), this.loc.months[d.month]);
+                    result = replacer(result, boundary('MM'), this.loc.months[d.h_month]);
                 case /M/.test(result):
-                    result = replacer(result, boundary('M'), locale.monthsShort[d.month]);
+                    result = replacer(result, boundary('M'), locale.monthsShort[d.h_month]);
                 case /ss/.test(result):
                     result = replacer(result, boundary('ss'), d.fullSeconds);
                 case /s/.test(result):
@@ -427,20 +427,20 @@
                 case /h/.test(result):
                     result = replacer(result, boundary('h'), hours);
                 case /yyyy/.test(result):
-                    result = replacer(result, boundary('yyyy'), d.year);
+                    result = replacer(result, boundary('yyyy'), d.h_year);
                 case /yyyy1/.test(result):
                     result = replacer(result, boundary('yyyy1'), decade[0]);
                 case /yyyy2/.test(result):
                     result = replacer(result, boundary('yyyy2'), decade[1]);
                 case /yy/.test(result):
-                    result = replacer(result, boundary('yy'), d.year.toString().slice(-2));
+                    result = replacer(result, boundary('yy'), d.h_year.toString().slice(-2));
             }
 
             return result;
         },
 
         _replacer: function (str, reg, data) {
-            return str.replace(reg, function (match, p1,p2,p3) {
+            return str.replace(reg, function (match, p1, p2, p3) {
                 return p1 + data + p3;
             })
         },
@@ -467,7 +467,7 @@
                 return;
             }
 
-            if (!(date instanceof Date)) return;
+            if (!(date._isAMomentObject)) return;
 
             this.lastSelectedDate = date;
 
@@ -483,20 +483,20 @@
             // Prevent from setting hours or minutes which values are lesser then `min` value or
             // greater then `max` value
             if (this.timepicker) {
-                date.setHours(this.timepicker.hours);
-                date.setMinutes(this.timepicker.minutes)
-                date.setSeconds(this.timepicker.seconds)
+                date.hour(this.timepicker.hours);
+                date.minute(this.timepicker.minutes);
+                date.second(this.timepicker.seconds);
             }
 
             if (_this.view == 'days') {
-                if (date.getMonth() != d.month && opts.moveToOtherMonthsOnSelect) {
-                    newDate = new Date(date.getFullYear(), date.getMonth(), 1);
+                if (date.iMonth() != d.h_month && opts.moveToOtherMonthsOnSelect) {
+                    newDate = moment().startOf('iMonth').iYear(date.iYear()).iMonth(date.iMonth());
                 }
             }
 
             if (_this.view == 'years') {
-                if (date.getFullYear() != d.year && opts.moveToOtherYearsOnSelect) {
-                    newDate = new Date(date.getFullYear(), 0, 1);
+                if (date.iYear() != d.h_year && opts.moveToOtherYearsOnSelect) {
+                    newDate = moment().startOf('iYear').iYear(date.iYear());
                 }
             }
 
@@ -525,7 +525,7 @@
                         _this.minRange = date;
                     }
                     // Swap dates if they were selected via dp.selectDate() and second date was smaller then first
-                    if (datepicker.bigger(_this.maxRange, _this.minRange)) {
+                    if (h_datepicker.bigger(_this.maxRange, _this.minRange)) {
                         _this.maxRange = _this.minRange;
                         _this.minRange = date;
                     }
@@ -560,10 +560,10 @@
             var selected = this.selectedDates,
                 _this = this;
 
-            if (!(date instanceof Date)) return;
+            if (!(date._isAMomentObject)) return;
 
             return selected.some(function (curDate, i) {
-                if (datepicker.isSame(curDate, date)) {
+                if (h_datepicker.isSame(curDate, date)) {
                     selected.splice(i, 1);
 
                     if (!_this.selectedDates.length) {
@@ -590,9 +590,9 @@
             this.silent = true;
             this.view = this.opts.minView;
             this.silent = false;
-            this.date = new Date();
+            this.date = moment();
 
-            if (this.opts.todayButton instanceof Date) {
+            if (this.opts.todayButton._isAMomentObject) {
                 this.selectDate(this.opts.todayButton)
             }
         },
@@ -633,12 +633,12 @@
             if (this.elIsInput && !this.opts.inline) {
                 this._setPositionClasses(this.opts.position);
                 if (this.visible) {
-                    this.setPosition(this.opts.position)
+                    this.setPosition(this.opts.position);
                 }
             }
 
             if (this.opts.classes) {
-                this.$datepicker.addClass(this.opts.classes)
+                this.$datepicker.addClass(this.opts.classes);
             }
 
             if (this.opts.onlyTimepicker) {
@@ -651,9 +651,9 @@
                 this.timepicker._updateCurrentTime();
                 // Change hours and minutes if it's values have been changed through min/max hours/minutes
                 if (lastSelectedDate) {
-                    lastSelectedDate.setHours(this.timepicker.hours);
-                    lastSelectedDate.setMinutes(this.timepicker.minutes);
-                    lastSelectedDate.setSeconds(this.timepicker.seconds);
+                    lastSelectedDate.hour(this.timepicker.hours);
+                    lastSelectedDate.minute(this.timepicker.minutes);
+                    lastSelectedDate.second(this.timepicker.seconds);
                 }
             }
 
@@ -663,7 +663,7 @@
         },
 
         _syncWithMinMaxDates: function () {
-            var curTime = this.date.getTime();
+            var curTime = this.date.valueOf();
             this.silent = true;
             if (this.minTime > curTime) {
                 this.date = this.minDate;
@@ -678,7 +678,7 @@
         _isSelected: function (checkDate, cellType) {
             var res = false;
             this.selectedDates.some(function (date) {
-                if (datepicker.isSame(date, checkDate, cellType)) {
+                if (h_datepicker.isSame(date, checkDate, cellType)) {
                     res = date;
                     return true;
                 }
@@ -717,16 +717,15 @@
          * @private
          */
         _isInRange: function (date, type) {
-            var time = date.getTime(),
-                d = datepicker.getParsedDate(date),
-                min = datepicker.getParsedDate(this.minDate),
-                max = datepicker.getParsedDate(this.maxDate),
-                dMinTime = new Date(d.year, d.month, min.date).getTime(),
-                dMaxTime = new Date(d.year, d.month, max.date).getTime(),
+            var time = date.valueOf(),
+                lastDayOfMonth = date.clone().iMonth(date.iMonth()+1).iDate(0).valueOf(),
+                firstDayOfMonth = date.clone().startOf("iMonth").valueOf(),
+                lastDayOfYear = date.clone().iYear(date.iYear()+1).iDate(0).valueOf(),
+                firstDayOfYear = date.clone().startOf("iYear").valueOf(),
                 types = {
                     day: time >= this.minTime && time <= this.maxTime,
-                    month: dMinTime >= this.minTime && dMaxTime <= this.maxTime,
-                    year: d.year >= min.year && d.year <= max.year
+                    month: lastDayOfMonth >= this.minTime && firstDayOfMonth <= this.maxTime,
+                    year: lastDayOfYear >= this.minTime && firstDayOfYear <= this.maxTime
                 };
             return type ? types[type] : types.day
         },
@@ -744,11 +743,11 @@
 
         _getDateFromCell: function (cell) {
             var curDate = this.parsedDate,
-                year = cell.data('year') || curDate.year,
-                month = cell.data('month') == undefined ? curDate.month : cell.data('month'),
+                year = cell.data('year') || curDate.h_year,
+                month = cell.data('month') == undefined ? curDate.h_month : cell.data('month'),
                 date = cell.data('date') || 1;
 
-            return new Date(year, month, date);
+            return moment().startOf('day').iYear(year).iMonth(month).iDate(date);
         },
 
         _setPositionClasses: function (pos) {
@@ -873,14 +872,14 @@
             if (nextView < 0) nextView = 0;
 
             this.silent = true;
-            this.date = new Date(date.getFullYear(), date.getMonth(), 1);
+            this.date = date.clone().iDate(1);
             this.silent = false;
             this.view = this.viewIndexes[nextView];
 
         },
 
         _handleHotKey: function (key) {
-            var date = datepicker.getParsedDate(this._getFocusedDate()),
+            var date = h_datepicker.getParsedDate(this._getFocusedDate()),
                 focusedParsed,
                 o = this.opts,
                 newDate,
@@ -928,22 +927,22 @@
                     break;
             }
 
-            totalDaysInNextMonth = datepicker.getDaysCount(new Date(y,m));
-            newDate = new Date(y,m,d);
+            totalDaysInNextMonth = h_datepicker.getDaysCount(moment(new Date(y,m)));
+            newDate = moment(new Date(y,m,d));
 
             // If next month has less days than current, set date to total days in that month
             if (totalDaysInNextMonth < d) d = totalDaysInNextMonth;
 
             // Check if newDate is in valid range
-            if (newDate.getTime() < this.minTime) {
+            if (newDate.valueOf() < this.minTime) {
                 newDate = this.minDate;
-            } else if (newDate.getTime() > this.maxTime) {
+            } else if (newDate.valueOf() > this.maxTime) {
                 newDate = this.maxDate;
             }
 
             this.focused = newDate;
 
-            focusedParsed = datepicker.getParsedDate(newDate);
+            focusedParsed = h_datepicker.getParsedDate(newDate);
             if (monthChanged && o.onChangeMonth) {
                 o.onChangeMonth(focusedParsed.month, focusedParsed.year)
             }
@@ -997,10 +996,10 @@
         _focusNextCell: function (keyCode, type) {
             type = type || this.cellType;
 
-            var date = datepicker.getParsedDate(this._getFocusedDate()),
-                y = date.year,
-                m = date.month,
-                d = date.date;
+            var date = h_datepicker.getParsedDate(this._getFocusedDate()),
+                y = date.h_year,
+                m = date.h_month,
+                d = date.h_date;
 
             if (this._isHotKeyPressed()){
                 return;
@@ -1029,10 +1028,10 @@
                     break;
             }
 
-            var nd = new Date(y,m,d);
-            if (nd.getTime() < this.minTime) {
+            var nd = moment().startOf('day').iYear(y).iMonth(m).iDate(d);
+            if (nd.valueOf() < this.minTime) {
                 nd = this.minDate;
-            } else if (nd.getTime() > this.maxTime) {
+            } else if (nd.valueOf() > this.maxTime) {
                 nd = this.maxDate;
             }
 
@@ -1047,13 +1046,13 @@
             if (!focused) {
                 switch (this.view) {
                     case 'days':
-                        focused = new Date(d.year, d.month, new Date().getDate());
+                        focused = moment().iYear(d.h_year).iMonth(d.h_month);
                         break;
                     case 'months':
-                        focused = new Date(d.year, d.month, 1);
+                        focused = moment().startOf('iMonth').iYear(d.h_year).iMonth(d.h_month);
                         break;
                     case 'years':
-                        focused = new Date(d.year, 0, 1);
+                        focused = moment().startOf('iYear');
                         break;
                 }
             }
@@ -1064,16 +1063,16 @@
         _getCell: function (date, type) {
             type = type || this.cellType;
 
-            var d = datepicker.getParsedDate(date),
-                selector = '.datepicker--cell[data-year="' + d.year + '"]',
+            var d = h_datepicker.getParsedDate(date),
+                selector = '.datepicker--cell[data-year="' + d.h_year + '"]',
                 $cell;
 
             switch (type) {
                 case 'month':
-                    selector = '[data-month="' + d.month + '"]';
+                    selector = '[data-month="' + d.h_month + '"]';
                     break;
                 case 'day':
-                    selector += '[data-month="' + d.month + '"][data-date="' + d.date + '"]';
+                    selector += '[data-month="' + d.h_month + '"][data-date="' + d.h_date + '"]';
                     break;
             }
             $cell = this.views[this.currentView].$el.find(selector);
@@ -1241,7 +1240,7 @@
             if (this.opts.range && this.selectedDates.length == 1) {
                 this.minRange = this.selectedDates[0];
                 this.maxRange = '';
-                if (datepicker.less(this.minRange, this.focused)) {
+                if (h_datepicker.less(this.minRange, this.focused)) {
                     this.maxRange = this.minRange;
                     this.minRange = '';
                 }
@@ -1260,7 +1259,7 @@
         },
 
         _onTimeChange: function (e, h, m, s) {
-            var date = new Date(),
+            var date = moment(),
                 selectedDates = this.selectedDates,
                 selected = false;
 
@@ -1269,9 +1268,9 @@
                 date = this.lastSelectedDate;
             }
 
-            date.setHours(h);
-            date.setMinutes(m);
-            date.setSeconds(s);
+            date.hour(h);
+            date.minute(m);
+            date.second(s);
 
             if (!selected && !this._getCell(date).hasClass('-disabled-')) {
                 this.selectDate(date);
@@ -1285,9 +1284,9 @@
 
         _onClickCell: function (e, date) {
             if (this.timepicker) {
-                date.setHours(this.timepicker.hours);
-                date.setMinutes(this.timepicker.minutes);
-                date.setSeconds(this.timepicker.seconds)
+                date.hour(this.timepicker.hours);
+                date.minute(this.timepicker.minutes);
+                date.second(this.timepicker.seconds);
             }
             this.selectDate(date);
         },
@@ -1304,7 +1303,7 @@
             if (this.opts.range && this.selectedDates.length == 1) {
                 this.minRange = this.selectedDates[0];
                 this.maxRange = '';
-                if (datepicker.less(this.minRange, this._focused)) {
+                if (h_datepicker.less(this.minRange, this._focused)) {
                     this.maxRange = this.minRange;
                     this.minRange = '';
                 }
@@ -1318,11 +1317,11 @@
         },
 
         get parsedDate() {
-            return datepicker.getParsedDate(this.date);
+            return h_datepicker.getParsedDate(this.date);
         },
 
         set date (val) {
-            if (!(val instanceof Date)) return;
+            if (!(val._isAMomentObject)) return;
 
             this.currentDate = val;
 
@@ -1352,7 +1351,7 @@
 
             if (this.inited) {
                 if (!this.views[val]) {
-                    this.views[val] = new  $.fn.datepicker.Body(this, val, this.opts)
+                    this.views[val] = new $.fn.h_datepicker.Body(this, val, this.opts)
                 } else {
                     this.views[val]._render();
                 }
@@ -1379,51 +1378,61 @@
         },
 
         get minTime() {
-            var min = datepicker.getParsedDate(this.minDate);
+            var min = h_datepicker.getParsedDate(this.minDate);
             return new Date(min.year, min.month, min.date).getTime()
         },
 
         get maxTime() {
-            var max = datepicker.getParsedDate(this.maxDate);
+            var max = h_datepicker.getParsedDate(this.maxDate);
             return new Date(max.year, max.month, max.date).getTime()
         },
 
         get curDecade() {
-            return datepicker.getDecade(this.date)
+            return h_datepicker.getDecade(this.date)
         }
     };
 
     //  Utils
     // -------------------------------------------------
 
-    datepicker.getDaysCount = function (date) {
-        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    h_datepicker.getDaysCount = function (date) {
+        return date.clone().month(date.month() + 1).date(0).date();
     };
 
-    datepicker.getParsedDate = function (date) {
+    h_datepicker.getHijriDaysCount = function (date) {
+        return date.clone().iMonth(date.iMonth() + 1).iDate(0).iDate();
+    };
+
+    h_datepicker.getParsedDate = function (date) {
+        if (!date._isAMomentObject && date instanceof Date) date = moment(date);
         return {
-            year: date.getFullYear(),
-            month: date.getMonth(),
-            fullMonth: (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1, // One based
-            date: date.getDate(),
-            fullDate: date.getDate() < 10 ? '0' + date.getDate() : date.getDate(),
-            day: date.getDay(),
-            hours: date.getHours(),
-            fullHours:  date.getHours() < 10 ? '0' + date.getHours() :  date.getHours() ,
-            minutes: date.getMinutes(),
-            fullMinutes:  date.getMinutes() < 10 ? '0' + date.getMinutes() :  date.getMinutes(),
-            seconds: date.getSeconds(),
-            fullSeconds:  date.getSeconds() < 10 ? '0' + date.getSeconds() :  date.getSeconds()
+            year: date.year(),
+            month: date.month(),
+            fullMonth: (date.month() + 1) < 10 ? '0' + (date.month() + 1) : date.month() + 1, // One based
+            date: date.date(),
+            fullDate: date.date() < 10 ? '0' + date.date() : date.date(),
+            day: date.day(),
+            h_year: date.iYear(),
+            h_month: date.iMonth(),
+            h_fullMonth: (date.iMonth() + 1) < 10 ? '0' + (date.iMonth() + 1) : date.iMonth() + 1, // One based
+            h_date: date.iDate(),
+            h_fullDate: date.iDate() < 10 ? '0' + date.iDate() : date.iDate(),
+            hours: date.hour(),
+            fullHours:  date.hour() < 10 ? '0' + date.hour() :  date.hour() ,
+            minutes: date.minute(),
+            fullMinutes:  date.minute() < 10 ? '0' + date.minute() :  date.minute(),
+            seconds: date.second(),
+            fullSeconds:  date.second() < 10 ? '0' + date.second() :  date.second()
         }
     };
 
-    datepicker.getDecade = function (date) {
-        var firstYear = Math.floor(date.getFullYear() / 10) * 10;
+    h_datepicker.getDecade = function (date) {
+        var firstYear = Math.floor(date.iYear() / 10) * 10;
 
         return [firstYear, firstYear + 9];
     };
 
-    datepicker.template = function (str, data) {
+    h_datepicker.template = function (str, data) {
         return str.replace(/#\{([\w]+)\}/g, function (source, match) {
             if (data[match] || data[match] === 0) {
                 return data[match]
@@ -1431,46 +1440,46 @@
         });
     };
 
-    datepicker.isSame = function (date1, date2, type) {
+    h_datepicker.isSame = function (date1, date2, type) {
         if (!date1 || !date2) return false;
-        var d1 = datepicker.getParsedDate(date1),
-            d2 = datepicker.getParsedDate(date2),
+        var d1 = h_datepicker.getParsedDate(date1),
+            d2 = h_datepicker.getParsedDate(date2),
             _type = type ? type : 'day',
 
             conditions = {
-                day: d1.date == d2.date && d1.month == d2.month && d1.year == d2.year,
-                month: d1.month == d2.month && d1.year == d2.year,
-                year: d1.year == d2.year
+                day: d1.h_date == d2.h_date && d1.h_month == d2.h_month && d1.h_year == d2.h_year,
+                month: d1.h_month == d2.h_month && d1.h_year == d2.h_year,
+                year: d1.h_year == d2.h_year
             };
 
         return conditions[_type];
     };
 
-    datepicker.less = function (dateCompareTo, date, type) {
+    h_datepicker.less = function (dateCompareTo, date, type) {
         if (!dateCompareTo || !date) return false;
-        return date.getTime() < dateCompareTo.getTime();
+        return date.valueOf() < dateCompareTo.valueOf();
     };
 
-    datepicker.bigger = function (dateCompareTo, date, type) {
+    h_datepicker.bigger = function (dateCompareTo, date, type) {
         if (!dateCompareTo || !date) return false;
-        return date.getTime() > dateCompareTo.getTime();
+        return date.valueOf() > dateCompareTo.valueOf();
     };
 
-    datepicker.getLeadingZeroNum = function (num) {
+    h_datepicker.getLeadingZeroNum = function (num) {
         return parseInt(num) < 10 ? '0' + num : num;
     };
 
     /**
      * Returns copy of date with hours and minutes equals to 0
-     * @param date {Date}
+     * @param date {moment}
      */
-    datepicker.resetTime = function (date) {
+    h_datepicker.resetTime = function (date) {
         if (typeof date != 'object') return;
-        date = datepicker.getParsedDate(date);
-        return new Date(date.year, date.month, date.date)
+        date = h_datepicker.getParsedDate(date);
+        return moment(new Date(date.year, date.month, date.date));
     };
 
-    $.fn.datepicker = function ( options ) {
+    $.fn.h_datepicker = function ( options ) {
         return this.each(function () {
             if (!$.data(this, pluginName)) {
                 $.data(this,  pluginName,
@@ -1484,25 +1493,49 @@
         });
     };
 
-    $.fn.datepicker.Constructor = Datepicker;
+    $.fn.h_datepicker.Constructor = Datepicker;
 
-    $.fn.datepicker.language = {
-        ru: {
-            days: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-            daysShort: ['Вос','Пон','Вто','Сре','Чет','Пят','Суб'],
-            daysMin: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
-            months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-            monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-            today: 'Сегодня',
-            clear: 'Очистить',
-            dateFormat: 'dd.mm.yyyy',
+    $.fn.h_datepicker.language = {
+        en: {
+            days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+            daysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            daysMin: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+            months: ["Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani", "Jumada al-Ula", "Jumada al-Thani", "Rajab", "Sha'ban", "Ramadhan", "Shawwal", "Thul-Qi'dah", "Thul-Hijjah"],
+            monthsShort: ['Muh', 'Saf', 'Rab-I', 'Rab-II', 'Jum-I', 'Jum-II', 'Raj', 'Sha', 'Ram', 'Shw', 'Dhu-Q', 'Dhu-H'],
+            today: 'Today',
+            clear: 'Clear',
+            dateFormat: 'dd/mm/yyyy',
+            timeFormat: 'hh:ii AA',
+            firstDay: 0
+        },
+        ar: {
+            days: ['الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعه', 'السبت'],
+            daysShort: ['أحد','إثن','ثلا','أرب','خمي','جمع','سبت'],
+            daysMin: ['أحد','إثن','ثلا','أرب','خمي','جمع','سبت'],
+            months: ['محرم', 'صفر', 'ربيع الأول', 'ربيع الثاني', 'جمادى الأولى', 'جمادى الآخرة', 'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'],
+            monthsShort: ['محرم', 'صفر', 'ربيع ١', 'ربيع ٢', 'جمادى ١', 'جمادى ٢', 'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'],
+            today: 'اليوم',
+            clear: 'حذف',
+            dateFormat: "dd/mm/yyyy",
+            timeFormat: "hh:ii aa",
+            firstDay: 0,
+        },
+        fr: {
+            days: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+            daysShort: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+            daysMin: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
+            months: ["Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani", "Jumada al-Ula", "Jumada al-Thani", "Rajab", "Sha'ban", "Ramadhan", "Shawwal", "Thul-Qi'dah", "Thul-Hijjah"],
+            monthsShort: ['Muh', 'Saf', 'Rab-I', 'Rab-II', 'Jum-I', 'Jum-II', 'Raj', 'Sha', 'Ram', 'Shw', 'Dhu-Q', 'Dhu-H'],
+            today: "Aujourd'hui",
+            clear: 'Effacer',
+            dateFormat: 'dd/mm/yyyy',
             timeFormat: 'hh:ii',
             firstDay: 1
         }
     };
 
     $(function () {
-        $(autoInitSelector).datepicker();
+        $(autoInitSelector).h_datepicker();
     })
 
 })();
@@ -1523,10 +1556,10 @@
         '<div class="datepicker--cells datepicker--cells-years"></div>' +
         '</div>'
         },
-        datepicker = $.fn.datepicker,
-        dp = datepicker.Constructor;
+        h_datepicker = $.fn.h_datepicker,
+        dp = h_datepicker.Constructor;
 
-    datepicker.Body = function (d, type, opts) {
+    h_datepicker.Body = function (d, type, opts) {
         this.d = d;
         this.type = type;
         this.opts = opts;
@@ -1536,7 +1569,7 @@
         this.init();
     };
 
-    datepicker.Body.prototype = {
+    h_datepicker.Body.prototype = {
         init: function () {
             this._buildBaseHtml();
             this._render();
@@ -1569,19 +1602,19 @@
 
         _getCellContents: function (date, type) {
             var classes = "datepicker--cell datepicker--cell-" + type,
-                currentDate = new Date(),
+                currentDate = moment(),
                 parent = this.d,
                 minRange = dp.resetTime(parent.minRange),
                 maxRange = dp.resetTime(parent.maxRange),
                 opts = parent.opts,
                 d = dp.getParsedDate(date),
                 render = {},
-                html = d.date;
+                html = d.h_date;
 
             switch (type) {
                 case 'day':
-                    if (parent.isWeekend(d.day)) classes += " -weekend-";
-                    if (d.month != this.d.parsedDate.month) {
+                    if (parent.isWeekend(d.h_day)) classes += " -weekend-";
+                    if (d.h_month != this.d.parsedDate.h_month) {
                         classes += " -other-month-";
                         if (!opts.selectOtherMonths) {
                             classes += " -disabled-";
@@ -1590,12 +1623,12 @@
                     }
                     break;
                 case 'month':
-                    html = parent.loc[parent.opts.monthsField][d.month];
+                    html = parent.loc[parent.opts.monthsField][d.h_month];
                     break;
                 case 'year':
                     var decade = parent.curDecade;
-                    html = d.year;
-                    if (d.year < decade[0] || d.year > decade[1]) {
+                    html = d.h_year;
+                    if (d.h_year < decade[0] || d.h_year > decade[1]) {
                         classes += ' -other-decade-';
                         if (!opts.selectOtherYears) {
                             classes += " -disabled-";
@@ -1656,9 +1689,9 @@
          * @private
          */
         _getDaysHtml: function (date) {
-            var totalMonthDays = dp.getDaysCount(date),
-                firstMonthDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay(),
-                lastMonthDay = new Date(date.getFullYear(), date.getMonth(), totalMonthDays).getDay(),
+            var totalMonthDays = dp.getHijriDaysCount(date),
+                firstMonthDay = date.clone().iDate(1).day(),
+                lastMonthDay = date.clone().iMonth(date.iMonth() + 1).iDate(0).day(),
                 daysFromPevMonth = firstMonthDay - this.d.loc.firstDay,
                 daysFromNextMonth = 6 - lastMonthDay + this.d.loc.firstDay;
 
@@ -1666,14 +1699,10 @@
             daysFromNextMonth = daysFromNextMonth > 6 ? daysFromNextMonth - 7 : daysFromNextMonth;
 
             var startDayIndex = -daysFromPevMonth + 1,
-                m, y,
                 html = '';
 
             for (var i = startDayIndex, max = totalMonthDays + daysFromNextMonth; i <= max; i++) {
-                y = date.getFullYear();
-                m = date.getMonth();
-
-                html += this._getDayHtml(new Date(y, m, i))
+                html += this._getDayHtml(date.clone().iDate(i));
             }
 
             return html;
@@ -1683,9 +1712,9 @@
            var content = this._getCellContents(date, 'day');
 
             return '<div class="' + content.classes + '" ' +
-                'data-date="' + date.getDate() + '" ' +
-                'data-month="' + date.getMonth() + '" ' +
-                'data-year="' + date.getFullYear() + '">' + content.html + '</div>';
+                'data-date="' + date.iDate() + '" ' +
+                'data-month="' + date.iMonth() + '" ' +
+                'data-year="' + date.iYear() + '">' + content.html + '</div>';
         },
 
         /**
@@ -1700,7 +1729,7 @@
                 i = 0;
 
             while(i < 12) {
-                html += this._getMonthHtml(new Date(d.year, i));
+                html += this._getMonthHtml(moment().startOf('iYear').iYear(d.h_year).iMonth(i));
                 i++
             }
 
@@ -1710,7 +1739,7 @@
         _getMonthHtml: function (date) {
             var content = this._getCellContents(date, 'month');
 
-            return '<div class="' + content.classes + '" data-month="' + date.getMonth() + '">' + content.html + '</div>'
+            return '<div class="' + content.classes + '" data-month="' + date.iMonth() + '">' + content.html + '</div>'
         },
 
         _getYearsHtml: function (date) {
@@ -1721,7 +1750,7 @@
                 i = firstYear;
 
             for (i; i <= decade[1] + 1; i++) {
-                html += this._getYearHtml(new Date(i , 0));
+                html += this._getYearHtml(moment().startOf('iYear').iYear(i));
             }
 
             return html;
@@ -1730,7 +1759,7 @@
         _getYearHtml: function (date) {
             var content = this._getCellContents(date, 'year');
 
-            return '<div class="' + content.classes + '" data-year="' + date.getFullYear() + '">' + content.html + '</div>'
+            return '<div class="' + content.classes + '" data-year="' + date.iYear() + '">' + content.html + '</div>'
         },
 
         _renderTypes: {
@@ -1789,15 +1818,15 @@
         _handleClick: function (el) {
             var date = el.data('date') || 1,
                 month = el.data('month') || 0,
-                year = el.data('year') || this.d.parsedDate.year,
+                year = el.data('year') || this.d.parsedDate.h_year,
                 dp = this.d;
             // Change view if min view does not reach yet
             if (dp.view != this.opts.minView) {
-                dp.down(new Date(year, month, date));
+                dp.down(moment().startOf('day').iYear(year).iMonth(month).iDate(date));
                 return;
             }
             // Select date if min view is reached
-            var selectedDate = new Date(year, month, date),
+            var selectedDate = moment().startOf('day').iYear(year).iMonth(month).iDate(date),
                 alreadySelected = this.d._isSelected(selectedDate, this.d.cellType);
 
             if (!alreadySelected) {
@@ -1826,10 +1855,10 @@
         '<div class="datepicker--nav-action" data-action="next">#{nextHtml}</div>',
         buttonsContainerTemplate = '<div class="datepicker--buttons"></div>',
         button = '<span class="datepicker--button" data-action="#{action}">#{label}</span>',
-        datepicker = $.fn.datepicker,
-        dp = datepicker.Constructor;
+        h_datepicker = $.fn.h_datepicker,
+        dp = h_datepicker.Constructor;
 
-    datepicker.Navigation = function (d, opts) {
+    h_datepicker.Navigation = function (d, opts) {
         this.d = d;
         this.opts = opts;
 
@@ -1838,7 +1867,7 @@
         this.init();
     };
 
-    datepicker.Navigation.prototype = {
+    h_datepicker.Navigation.prototype = {
         init: function () {
             this._buildBaseHtml();
             this._bindEvents();
@@ -1902,35 +1931,33 @@
 
         setNavStatus: function () {
             if (!(this.opts.minDate || this.opts.maxDate) || !this.opts.disableNavWhenOutOfRange) return;
-
-            var date = this.d.parsedDate,
-                m = date.month,
-                y = date.year,
-                d = date.date;
+            var date = this.d.date,
+                minDate = this.d.minDate.valueOf(),
+                maxDate = this.d.maxDate.valueOf();
 
             switch (this.d.view) {
                 case 'days':
-                    if (!this.d._isInRange(new Date(y, m-1, 1), 'month')) {
+                    if (date.clone().iDate(0).valueOf() < minDate) {
                         this._disableNav('prev')
                     }
-                    if (!this.d._isInRange(new Date(y, m+1, 1), 'month')) {
+                    if (date.clone().iMonth(date.iMonth()+1).iDate(1).valueOf() >= maxDate) {
                         this._disableNav('next')
                     }
                     break;
                 case 'months':
-                    if (!this.d._isInRange(new Date(y-1, m, d), 'year')) {
+                    if (date.clone().iMonth(0).iDate(0).valueOf() < minDate) {
                         this._disableNav('prev')
                     }
-                    if (!this.d._isInRange(new Date(y+1, m, d), 'year')) {
+                    if (date.clone().startOf("iYear").iYear(date.iYear()+1).valueOf() >= maxDate) {
                         this._disableNav('next')
                     }
                     break;
                 case 'years':
-                    var decade = dp.getDecade(this.d.date);
-                    if (!this.d._isInRange(new Date(decade[0] - 1, 0, 1), 'year')) {
+                    var decade = dp.getDecade(date);
+                    if (date.clone().startOf("iYear").iYear(decade[0]).iDate(0).valueOf() < minDate) {
                         this._disableNav('prev')
                     }
-                    if (!this.d._isInRange(new Date(decade[1] + 1, 0, 1), 'year')) {
+                    if (date.clone().startOf("iYear").iYear(decade[1] + 1).valueOf() >= maxDate) {
                         this._disableNav('next')
                     }
                     break;
@@ -1986,17 +2013,17 @@
         '   </div>' +
         '</div>' +
         '</div>',
-        datepicker = $.fn.datepicker,
-        dp = datepicker.Constructor;
+        h_datepicker = $.fn.h_datepicker,
+        dp = h_datepicker.Constructor;
 
-    datepicker.Timepicker = function (inst, opts) {
+    h_datepicker.Timepicker = function (inst, opts) {
         this.d = inst;
         this.opts = opts;
 
         this.init();
     };
 
-    datepicker.Timepicker.prototype = {
+    h_datepicker.Timepicker.prototype = {
         init: function () {
             var input = 'input';
             this._setTime(this.d.date);
@@ -2029,26 +2056,26 @@
          * @private
          */
         _setMinTimeFromDate: function (date) {
-            this.minHours = date.getHours();
-            this.minMinutes = date.getMinutes();
-            this.minSeconds = date.getSeconds();
+            this.minHours = date.hour();
+            this.minMinutes = date.minute();
+            this.minSeconds = date.second();
 
             // If, for example, min hours are 10, and current hours are 12,
             // update minMinutes to default value, to be able to choose whole range of values
             if (this.d.lastSelectedDate) {
-                if (this.d.lastSelectedDate.getHours() > date.getHours()) {
+                if (this.d.lastSelectedDate.hour() > date.hour()) {
                     this.minMinutes = this.opts.minMinutes;
                 }
             }
         },
 
         _setMaxTimeFromDate: function (date) {
-            this.maxHours = date.getHours();
-            this.maxMinutes = date.getMinutes();
-            this.maxSeconds = date.getSeconds();
+            this.maxHours = date.hour();
+            this.maxMinutes = date.minute();
+            this.maxSeconds = date.second();
 
             if (this.d.lastSelectedDate) {
-                if (this.d.lastSelectedDate.getHours() < date.getHours()) {
+                if (this.d.lastSelectedDate.hour() < date.hour()) {
                     this.maxMinutes = this.opts.maxMinutes;
                 }
             }
@@ -2187,7 +2214,7 @@
 
         /**
          * Calculates valid hour value to display in text input and datepicker's body.
-         * @param date {Date|Number} - date or hours
+         * @param date {Date|Moment|Number} - date or hours
          * @param [ampm] {Boolean} - 12 hours mode
          * @returns {{hours: *, dayPeriod: string}}
          * @private
@@ -2196,7 +2223,7 @@
             var d = date,
                 hours = date;
 
-            if (date instanceof Date) {
+            if (date instanceof Date || date._isAMomentObject) {
                 d = dp.getParsedDate(date);
                 hours = d.hours;
             }

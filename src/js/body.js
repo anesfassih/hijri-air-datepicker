@@ -14,10 +14,10 @@
         '<div class="datepicker--cells datepicker--cells-years"></div>' +
         '</div>'
         },
-        datepicker = $.fn.datepicker,
-        dp = datepicker.Constructor;
+        h_datepicker = $.fn.h_datepicker,
+        dp = h_datepicker.Constructor;
 
-    datepicker.Body = function (d, type, opts) {
+    h_datepicker.Body = function (d, type, opts) {
         this.d = d;
         this.type = type;
         this.opts = opts;
@@ -27,7 +27,7 @@
         this.init();
     };
 
-    datepicker.Body.prototype = {
+    h_datepicker.Body.prototype = {
         init: function () {
             this._buildBaseHtml();
             this._render();
@@ -60,19 +60,19 @@
 
         _getCellContents: function (date, type) {
             var classes = "datepicker--cell datepicker--cell-" + type,
-                currentDate = new Date(),
+                currentDate = moment(),
                 parent = this.d,
                 minRange = dp.resetTime(parent.minRange),
                 maxRange = dp.resetTime(parent.maxRange),
                 opts = parent.opts,
                 d = dp.getParsedDate(date),
                 render = {},
-                html = d.date;
+                html = d.h_date;
 
             switch (type) {
                 case 'day':
-                    if (parent.isWeekend(d.day)) classes += " -weekend-";
-                    if (d.month != this.d.parsedDate.month) {
+                    if (parent.isWeekend(d.h_day)) classes += " -weekend-";
+                    if (d.h_month != this.d.parsedDate.h_month) {
                         classes += " -other-month-";
                         if (!opts.selectOtherMonths) {
                             classes += " -disabled-";
@@ -81,12 +81,12 @@
                     }
                     break;
                 case 'month':
-                    html = parent.loc[parent.opts.monthsField][d.month];
+                    html = parent.loc[parent.opts.monthsField][d.h_month];
                     break;
                 case 'year':
                     var decade = parent.curDecade;
-                    html = d.year;
-                    if (d.year < decade[0] || d.year > decade[1]) {
+                    html = d.h_year;
+                    if (d.h_year < decade[0] || d.h_year > decade[1]) {
                         classes += ' -other-decade-';
                         if (!opts.selectOtherYears) {
                             classes += " -disabled-";
@@ -147,9 +147,9 @@
          * @private
          */
         _getDaysHtml: function (date) {
-            var totalMonthDays = dp.getDaysCount(date),
-                firstMonthDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay(),
-                lastMonthDay = new Date(date.getFullYear(), date.getMonth(), totalMonthDays).getDay(),
+            var totalMonthDays = dp.getHijriDaysCount(date),
+                firstMonthDay = date.clone().iDate(1).day(),
+                lastMonthDay = date.clone().iMonth(date.iMonth() + 1).iDate(0).day(),
                 daysFromPevMonth = firstMonthDay - this.d.loc.firstDay,
                 daysFromNextMonth = 6 - lastMonthDay + this.d.loc.firstDay;
 
@@ -157,14 +157,10 @@
             daysFromNextMonth = daysFromNextMonth > 6 ? daysFromNextMonth - 7 : daysFromNextMonth;
 
             var startDayIndex = -daysFromPevMonth + 1,
-                m, y,
                 html = '';
 
             for (var i = startDayIndex, max = totalMonthDays + daysFromNextMonth; i <= max; i++) {
-                y = date.getFullYear();
-                m = date.getMonth();
-
-                html += this._getDayHtml(new Date(y, m, i))
+                html += this._getDayHtml(date.clone().iDate(i));
             }
 
             return html;
@@ -174,9 +170,9 @@
            var content = this._getCellContents(date, 'day');
 
             return '<div class="' + content.classes + '" ' +
-                'data-date="' + date.getDate() + '" ' +
-                'data-month="' + date.getMonth() + '" ' +
-                'data-year="' + date.getFullYear() + '">' + content.html + '</div>';
+                'data-date="' + date.iDate() + '" ' +
+                'data-month="' + date.iMonth() + '" ' +
+                'data-year="' + date.iYear() + '">' + content.html + '</div>';
         },
 
         /**
@@ -191,7 +187,7 @@
                 i = 0;
 
             while(i < 12) {
-                html += this._getMonthHtml(new Date(d.year, i));
+                html += this._getMonthHtml(moment().startOf('iYear').iYear(d.h_year).iMonth(i));
                 i++
             }
 
@@ -201,7 +197,7 @@
         _getMonthHtml: function (date) {
             var content = this._getCellContents(date, 'month');
 
-            return '<div class="' + content.classes + '" data-month="' + date.getMonth() + '">' + content.html + '</div>'
+            return '<div class="' + content.classes + '" data-month="' + date.iMonth() + '">' + content.html + '</div>'
         },
 
         _getYearsHtml: function (date) {
@@ -212,7 +208,7 @@
                 i = firstYear;
 
             for (i; i <= decade[1] + 1; i++) {
-                html += this._getYearHtml(new Date(i , 0));
+                html += this._getYearHtml(moment().startOf('iYear').iYear(i));
             }
 
             return html;
@@ -221,7 +217,7 @@
         _getYearHtml: function (date) {
             var content = this._getCellContents(date, 'year');
 
-            return '<div class="' + content.classes + '" data-year="' + date.getFullYear() + '">' + content.html + '</div>'
+            return '<div class="' + content.classes + '" data-year="' + date.iYear() + '">' + content.html + '</div>'
         },
 
         _renderTypes: {
@@ -280,15 +276,15 @@
         _handleClick: function (el) {
             var date = el.data('date') || 1,
                 month = el.data('month') || 0,
-                year = el.data('year') || this.d.parsedDate.year,
+                year = el.data('year') || this.d.parsedDate.h_year,
                 dp = this.d;
             // Change view if min view does not reach yet
             if (dp.view != this.opts.minView) {
-                dp.down(new Date(year, month, date));
+                dp.down(moment().startOf('day').iYear(year).iMonth(month).iDate(date));
                 return;
             }
             // Select date if min view is reached
-            var selectedDate = new Date(year, month, date),
+            var selectedDate = moment().startOf('day').iYear(year).iMonth(month).iDate(date),
                 alreadySelected = this.d._isSelected(selectedDate, this.d.cellType);
 
             if (!alreadySelected) {

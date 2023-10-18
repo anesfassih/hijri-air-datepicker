@@ -4,8 +4,12 @@
         <meta charset="UTF-8">
         <title>Air datepicker visual tests</title>
         <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
-        <script type="text/javascript" src="dist/js/datepicker.js"></script>
-        <script type="text/javascript" src="dist/js/i18n/datepicker.en.js"></script>
+        <script type="text/javascript" src="src/js/moment.js"></script>
+        <script type="text/javascript" src="node_modules/moment-hijri/moment-hijri.js"></script>
+        <script type="text/javascript" src="src/js/datepicker.js"></script>
+        <script type="text/javascript" src="src/js/body.js"></script>
+        <script type="text/javascript" src="src/js/navigation.js"></script>
+        <script type="text/javascript" src="src/js/timepicker.js"></script>
         <link rel="stylesheet" href="dist/css/datepicker.css"/>
         <link rel="stylesheet" href="docs/css/style.css"/>
         <script type="text/javascript">
@@ -32,7 +36,18 @@
                 <div class="row">
                     <div class="vt-tile">
                         <h2>Default</h2>
-                        <div class="datepicker-here" data-language="en"></div>
+                        <div class="datepicker-here" data-language="ar"></div>
+                    </div>
+                    <div class="vt-tile">
+                        <h2>With options</h2>
+                        <div id="dp-test" class="datepicker-here" data-language="en"></div>
+                        <script type="text/javascript">
+                            $('#dp-test').h_datepicker({
+                                dateFormat: "dd-mm-yyyy",
+                                minDate: moment('2023/08/08', 'YYYY/M/D'),
+                                maxDate: moment('2023/08/28', 'YYYY/M/D'),
+                            })
+                        </script>
                     </div>
                 </div>
             </article>
@@ -48,7 +63,8 @@
                         <h2>{range: true, onSelect: ...}</h2>
                         <div class="datepicker-here" data-language="en" id="dp-3" data-range="true"></div>
                         <script type="text/javascript">
-                            $('#dp-3').datepicker({
+                            $('#dp-3').h_datepicker({
+                                dateFormat: "dd-mm-yyyy",
                                 onSelect: function (fd) {
                                     log(fd)
                                 }
@@ -59,7 +75,8 @@
                         <h2>{range: true, onSelect: ...}</h2>
                         <input class="datepicker-here" data-language="en" id="dp-4" data-range="true"/>
                         <script type="text/javascript">
-                            $('#dp-4').datepicker({
+                            $('#dp-4').h_datepicker({
+                                dateFormat: "dd-mm-yyyy",
                                 onSelect: function (fd) {
                                     log(fd)
                                 }
@@ -76,7 +93,7 @@
                         <h2>{timepicker: true}</h2>
                         <div id="test" class="datepicker-here" data-language="en" data-timepicker="true"></div>
                         <script type="text/javascript">
-                            $('#test').datepicker({
+                            $('#test').h_datepicker({
                                 toggleSelected: false,
                                 inline: true,
                                 timeFormat: 'hh:ii:ss',
@@ -91,7 +108,7 @@
                         <h2>{onChange: ..., toggleSelected: false, range: true}</h2>
                         <input id="dp-5" class="datepicker-here" data-language="en" data-timepicker="true" />
                         <script type="text/javascript">
-                            $('#dp-5').datepicker({
+                            $('#dp-5').h_datepicker({
                                 toggleSelected: false,
                                 inline: true,
                                 range: true,
@@ -107,11 +124,11 @@
                         <input class="datepicker-here" data-language="en" data-timepicker="true" />
                     </div>
                     <div class="vt-tile">
-                        <h2>{timepicker: true, minDate: new Date()}</h2>
+                        <h2>{timepicker: true, minDate: moment()}</h2>
                         <input class="datepicker-here" data-language="en" id="dp-6"/>
                         <script type="text/javascript">
-                            $('#dp-6').datepicker({
-                                minDate: new Date(),
+                            $('#dp-6').h_datepicker({
+                                minDate: moment(),
                                 inline: true,
                                 timepicker: true
                             })

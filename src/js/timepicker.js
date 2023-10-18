@@ -19,17 +19,17 @@
         '   </div>' +
         '</div>' +
         '</div>',
-        datepicker = $.fn.datepicker,
-        dp = datepicker.Constructor;
+        h_datepicker = $.fn.h_datepicker,
+        dp = h_datepicker.Constructor;
 
-    datepicker.Timepicker = function (inst, opts) {
+    h_datepicker.Timepicker = function (inst, opts) {
         this.d = inst;
         this.opts = opts;
 
         this.init();
     };
 
-    datepicker.Timepicker.prototype = {
+    h_datepicker.Timepicker.prototype = {
         init: function () {
             var input = 'input';
             this._setTime(this.d.date);
@@ -62,26 +62,26 @@
          * @private
          */
         _setMinTimeFromDate: function (date) {
-            this.minHours = date.getHours();
-            this.minMinutes = date.getMinutes();
-            this.minSeconds = date.getSeconds();
+            this.minHours = date.hour();
+            this.minMinutes = date.minute();
+            this.minSeconds = date.second();
 
             // If, for example, min hours are 10, and current hours are 12,
             // update minMinutes to default value, to be able to choose whole range of values
             if (this.d.lastSelectedDate) {
-                if (this.d.lastSelectedDate.getHours() > date.getHours()) {
+                if (this.d.lastSelectedDate.hour() > date.hour()) {
                     this.minMinutes = this.opts.minMinutes;
                 }
             }
         },
 
         _setMaxTimeFromDate: function (date) {
-            this.maxHours = date.getHours();
-            this.maxMinutes = date.getMinutes();
-            this.maxSeconds = date.getSeconds();
+            this.maxHours = date.hour();
+            this.maxMinutes = date.minute();
+            this.maxSeconds = date.second();
 
             if (this.d.lastSelectedDate) {
-                if (this.d.lastSelectedDate.getHours() < date.getHours()) {
+                if (this.d.lastSelectedDate.hour() < date.hour()) {
                     this.maxMinutes = this.opts.maxMinutes;
                 }
             }
@@ -220,7 +220,7 @@
 
         /**
          * Calculates valid hour value to display in text input and datepicker's body.
-         * @param date {Date|Number} - date or hours
+         * @param date {Date|Moment|Number} - date or hours
          * @param [ampm] {Boolean} - 12 hours mode
          * @returns {{hours: *, dayPeriod: string}}
          * @private
@@ -229,7 +229,7 @@
             var d = date,
                 hours = date;
 
-            if (date instanceof Date) {
+            if (date instanceof Date || date._isAMomentObject) {
                 d = dp.getParsedDate(date);
                 hours = d.hours;
             }

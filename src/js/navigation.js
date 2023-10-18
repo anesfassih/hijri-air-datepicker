@@ -5,10 +5,10 @@
         '<div class="datepicker--nav-action" data-action="next">#{nextHtml}</div>',
         buttonsContainerTemplate = '<div class="datepicker--buttons"></div>',
         button = '<span class="datepicker--button" data-action="#{action}">#{label}</span>',
-        datepicker = $.fn.datepicker,
-        dp = datepicker.Constructor;
+        h_datepicker = $.fn.h_datepicker,
+        dp = h_datepicker.Constructor;
 
-    datepicker.Navigation = function (d, opts) {
+    h_datepicker.Navigation = function (d, opts) {
         this.d = d;
         this.opts = opts;
 
@@ -17,7 +17,7 @@
         this.init();
     };
 
-    datepicker.Navigation.prototype = {
+    h_datepicker.Navigation.prototype = {
         init: function () {
             this._buildBaseHtml();
             this._bindEvents();
@@ -81,35 +81,33 @@
 
         setNavStatus: function () {
             if (!(this.opts.minDate || this.opts.maxDate) || !this.opts.disableNavWhenOutOfRange) return;
-
-            var date = this.d.parsedDate,
-                m = date.month,
-                y = date.year,
-                d = date.date;
+            var date = this.d.date,
+                minDate = this.d.minDate.valueOf(),
+                maxDate = this.d.maxDate.valueOf();
 
             switch (this.d.view) {
                 case 'days':
-                    if (!this.d._isInRange(new Date(y, m-1, 1), 'month')) {
+                    if (date.clone().iDate(0).valueOf() < minDate) {
                         this._disableNav('prev')
                     }
-                    if (!this.d._isInRange(new Date(y, m+1, 1), 'month')) {
+                    if (date.clone().iMonth(date.iMonth()+1).iDate(1).valueOf() >= maxDate) {
                         this._disableNav('next')
                     }
                     break;
                 case 'months':
-                    if (!this.d._isInRange(new Date(y-1, m, d), 'year')) {
+                    if (date.clone().iMonth(0).iDate(0).valueOf() < minDate) {
                         this._disableNav('prev')
                     }
-                    if (!this.d._isInRange(new Date(y+1, m, d), 'year')) {
+                    if (date.clone().startOf("iYear").iYear(date.iYear()+1).valueOf() >= maxDate) {
                         this._disableNav('next')
                     }
                     break;
                 case 'years':
-                    var decade = dp.getDecade(this.d.date);
-                    if (!this.d._isInRange(new Date(decade[0] - 1, 0, 1), 'year')) {
+                    var decade = dp.getDecade(date);
+                    if (date.clone().startOf("iYear").iYear(decade[0]).iDate(0).valueOf() < minDate) {
                         this._disableNav('prev')
                     }
-                    if (!this.d._isInRange(new Date(decade[1] + 1, 0, 1), 'year')) {
+                    if (date.clone().startOf("iYear").iYear(decade[1] + 1).valueOf() >= maxDate) {
                         this._disableNav('next')
                     }
                     break;
